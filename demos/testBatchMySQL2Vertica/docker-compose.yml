@@ -1,0 +1,53 @@
+version: '3'
+services:
+  jobmanager:
+    image: vertica/vertica-flink-connector_1.15.0:0.1.0
+    build: .
+    depends_on:
+      - mysql
+      - vertica
+    hostname: "jobmanager"
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      TZ: "Asia/Shanghai"
+      JOB_MANAGER_RPC_ADDRESS: "jobmanager"
+    volumes:
+      - /tmp:/tmp
+  taskmanager:
+    image: vertica/vertica-flink-connector_1.15.0:0.1.0
+    build: .
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      TZ: "Asia/Shanghai"
+      JOB_MANAGER_RPC_ADDRESS: "jobmanager"
+    volumes:
+      - /tmp:/tmp
+  mysql:
+    image: mysql:8.0.19
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      TZ: "Asia/Shanghai"
+      MYSQL_DATABASE: "demodb"
+      MYSQL_USER: "demouser"
+      MYSQL_PASSWORD: "demopwd"
+      MYSQL_ROOT_PASSWORD: "demopwd"
+    volumes:
+      - /tmp:/tmp
+  vertica:
+   image: vertica/vertica-ce:11.1.1-0
+   environment:
+     TZ: "Asia/Shanghai"
+     APP_DB_USER: "dbadmin"
+     APP_DB_PASSWORD: "demopwd"
+   ports:
+     - "5433:5433"
+     - "5444:5444"
+   volumes:
+     - /tmp:/tmp
+

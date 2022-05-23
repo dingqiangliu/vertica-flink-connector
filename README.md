@@ -8,6 +8,8 @@ This project is a plugin of  [**Flink JDBC SQL Connector**](https://nightlies.ap
 
 ### Write data from MySQL to Vertica by batch
 
+This [demo](./demos/testBatchMySQL2Vertica/testBatchMySQL2Vertica.sh) can be easily run with [docker-compose](https://docs.docker.com/compose/). Here is the key part:
+
 ```SQL
 CREATE TABLE test_flink_orders (
     orderID INT
@@ -76,6 +78,8 @@ FROM test_flink_orders;
 ```
 
 ### Ingesting changes of MySQL to Vertica in real-time
+
+This [demo](./demos/testCDCMySQL2Vertica/testCDCMySQL2Vertica.sh) can be easily run with [docker-compose](https://docs.docker.com/compose/). Here is its key part:
 
 ```SQL
 CREATE TABLE test_flink_orders (
