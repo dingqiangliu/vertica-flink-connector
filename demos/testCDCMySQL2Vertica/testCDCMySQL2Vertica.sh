@@ -13,7 +13,7 @@ TGT_DB_PWD="demopwd"
 
 SRC_INIT_ROWCOUNT=10000
 TGT_INIT_ROWCOUNT=0
-INC_ROWCOUNT=200
+INC_ROWCOUNT=10000
 UPDATE_PCT=10
 DELETE_PCT=10
 
@@ -348,10 +348,7 @@ function gen_data ()
   UpDelRows="$((UpRows+DelRows))"
 
   # INSERT incremental 1, UpDelRows
-  for i in $(seq 1 ${UpDelRows}) ; do
-    orderID=$((SRC_INIT_ROWCOUNT + i))
-    ${MYSQL} -N <<< "INSERT INTO test_flink_orders(orderID) VALUES(${orderID})"
-  done
+  ${MYSQL} -N <<< "SET session cte_max_recursion_depth = ${UpDelRows}; INSERT INTO test_flink_orders(orderID) WITH RECURSIVE seq AS (SELECT ${SRC_INIT_ROWCOUNT} + 1 AS value UNION ALL SELECT value + 1 FROM seq limit ${UpDelRows}) SELECT value FROM seq;"
   # waiting INSERT incremental 1
   echo "$(date +%H:%M:%S) waiting INSERT incremental 1, related rows: ${UpDelRows} ..."
   while test "$((TGT_INIT_ROWCOUNT+$(get_target_row_count)))" -lt "$((SRC_INIT_ROWCOUNT+UpDelRows))" ; do 
@@ -371,10 +368,7 @@ function gen_data ()
   done
   
   # INSERT incremental 2, INC_ROWCOUNT-UpRows
-  for i in $(seq $((UpRows+1)) ${INC_ROWCOUNT}) ; do
-    orderID=$((SRC_INIT_ROWCOUNT + i))
-    ${MYSQL} -N <<< "INSERT INTO test_flink_orders(orderID) VALUES(${orderID})"
-  done
+  ${MYSQL} -N <<< "SET session cte_max_recursion_depth = $((INC_ROWCOUNT-UpRows)); INSERT INTO test_flink_orders(orderID) WITH RECURSIVE seq AS (SELECT ${SRC_INIT_ROWCOUNT} + ${UpRows} + 1 AS value UNION ALL SELECT value + 1 FROM seq limit $((INC_ROWCOUNT-UpRows))) SELECT value FROM seq;"
   # waiting INSERT incremental 2
   echo "$(date +%H:%M:%S) waiting INSERT incremental 2, related rows: $((INC_ROWCOUNT-UpRows)) ..."
   while test "$((TGT_INIT_ROWCOUNT+$(get_target_row_count)))" -lt "$((SRC_INIT_ROWCOUNT+INC_ROWCOUNT))" ; do 
