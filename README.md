@@ -1,8 +1,10 @@
 # Vertica Connector for Flink
 
-This project is a plugin of  [**Flink JDBC SQL Connector**](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/jdbc/) to allow reading data from Vertica by batch,  writing data into Vertica from streams of  [**Flink CDC Connectors**](https://ververica.github.io/flink-cdc-connectors/master/content/about.html) for other databases like PostgreSQL/MySQL/Oracle/SQL Server and other streams or batch sources.
+This project is a plugin of  [**Flink JDBC SQL Connector**](https://nightlies.apache.org/flink/flink-docs-stable/docs/connectors/table/jdbc/) to allow reading data from Vertica by batch,  writing data into Vertica from streams of  [**Flink CDC Connectors**](https://nightlies.apache.org/flink/flink-cdc-docs-stable/docs/connectors/legacy-flink-cdc-sources/overview/) for other databases like PostgreSQL/MySQL/Oracle/SQL Server and other streams or batch sources.
 
 ![The architecture of Flink](https://flink.apache.org/img/flink-home-graphic.png)
+
+![The architecture of Flink CDC](https://nightlies.apache.org/flink/flink-cdc-docs-stable/fig/cdc-flow.png)
 
 ## Examples
 
@@ -152,7 +154,7 @@ FROM test_flink_orders;
 
 ## Installation
 
-At first, you need setup [Flink](https://flink.apache.org/) cluster and its [JDBC SQL Connector](https://nightlies.apache.org/flink/flink-docs-release-1.15/docs/connectors/table/jdbc/), and [CDC Connectors](https://ververica.github.io/flink-cdc-connectors/master/content/about.html) optionally.
+At first, you need setup [Flink](https://flink.apache.org/) cluster and its [JDBC SQL Connector](https://nightlies.apache.org/flink/flink-docs-stable/docs/connectors/table/jdbc/), and [CDC Connectors](https://nightlies.apache.org/flink/flink-cdc-docs-stable/docs/connectors/overview/) optionally.
 
 You can [download](https://github.com/dingqiangliu/vertica-flink-connector/releases/latest) the latest version of **`vertica-flink-connector_${FLINK_VERSON}-*.jar`**, or build it from source code of this project, and just put it in **${FLINK_HOME}/lib** and restart you cluster..
 

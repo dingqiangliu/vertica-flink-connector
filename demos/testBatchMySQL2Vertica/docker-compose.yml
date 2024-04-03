@@ -1,7 +1,7 @@
 version: '3'
 services:
   jobmanager:
-    image: vertica/vertica-flink-connector_1.15.0:0.1.0
+    image: vertica/vertica-flink-connector_3.1.2-1.18.0:0.1.0
     build: .
     depends_on:
       - mysql
@@ -16,7 +16,7 @@ services:
     volumes:
       - /tmp:/tmp
   taskmanager:
-    image: vertica/vertica-flink-connector_1.15.0:0.1.0
+    image: vertica/vertica-flink-connector_3.1.2-1.18.0:0.1.0
     build: .
     depends_on:
       - jobmanager
@@ -40,7 +40,7 @@ services:
     volumes:
       - /tmp:/tmp
   vertica:
-   image: vertica/vertica-ce:11.1.1-0
+   image: vertica/vertica-ce:24.1.0-0
    environment:
      TZ: "Asia/Shanghai"
      APP_DB_USER: "dbadmin"

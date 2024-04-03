@@ -14,8 +14,8 @@ TGT_DB_PWD="demopwd"
 SRC_INIT_ROWCOUNT=10000
 TGT_INIT_ROWCOUNT=0
 INC_ROWCOUNT=10000
-UPDATE_PCT=10
-DELETE_PCT=10
+UPDATE_PCT=50
+DELETE_PCT=0.1
 
 JOB_NAME="insert-into_default_catalog.default_database.test_flink_orders_target"
 
@@ -271,31 +271,31 @@ EOF
 
 function start_job ()
 {
-  if ${FLINK_HOME}/bin/flink list -r | grep -q "${JOB_NAME}" ; then
+  if ${FLINK_HOME}/bin/flink list -r 2>/dev/null | grep -q "${JOB_NAME}" ; then
     echo "Job is already running!" >&2
     exit 1
   fi
 
-  ${FLINK_HOME}/bin/sql-client.sh embedded -u "$(getJobSQL)"
+  ${FLINK_HOME}/bin/sql-client.sh embedded -u "$(getJobSQL)" 2>/dev/null
 }
 
 
 function stop_job ()
 {
-  if ! ${FLINK_HOME}/bin/flink list -r | grep -q "${JOB_NAME}" ; then
+  if ! ${FLINK_HOME}/bin/flink list -r 2>/dev/null | grep -q "${JOB_NAME}" ; then
     echo "No job is running!" >&2
     exit 1
   fi
 
-  ${FLINK_HOME}/bin/flink list -r \
+  ${FLINK_HOME}/bin/flink list -r 2>/dev/null \
     | grep "${JOB_NAME}" | awk '{print $4}' \
-    | xargs -i ${FLINK_HOME}/bin/flink stop --savepointPath /tmp/ {}
+    | xargs -i ${FLINK_HOME}/bin/flink stop --savepointPath /tmp/ {} 2>/dev/null
 }
 
 
 function resume_job ()
 {
-  if ${FLINK_HOME}/bin/flink list -r | grep -q "${JOB_NAME}" ; then
+  if ${FLINK_HOME}/bin/flink list -r 2>/dev/null | grep -q "${JOB_NAME}" ; then
     echo "Job is running!" >&2
     exit 1
   fi
@@ -306,18 +306,18 @@ function resume_job ()
     exit 1
   fi
 
-  ${FLINK_HOME}/bin/sql-client.sh embedded -u "$(echo "SET execution.savepoint.path=${savepointPath};"; getJobSQL)"
+  ${FLINK_HOME}/bin/sql-client.sh embedded -u "$(echo "SET execution.savepoint.path=${savepointPath};"; getJobSQL)" 2>/dev/null
 }
 
 
 function cancel_job ()
 {
-  if ! ${FLINK_HOME}/bin/flink list -r | grep -q "${JOB_NAME}" ; then
+  if ! ${FLINK_HOME}/bin/flink list -r 2>/dev/null | grep -q "${JOB_NAME}" ; then
     echo "No job is running!" >&2
     exit 1
   fi
 
-  ${FLINK_HOME}/bin/flink list -r | grep "${JOB_NAME}" | awk '{print $4}' | xargs -i ${FLINK_HOME}/bin/flink cancel {}
+  ${FLINK_HOME}/bin/flink list -r 2>/dev/null | grep "${JOB_NAME}" | awk '{print $4}' | xargs -i ${FLINK_HOME}/bin/flink cancel {} 2>/dev/null
 }
 
 
@@ -343,8 +343,8 @@ function gen_data ()
     sleep 1
   done
   
-  UpRows="$((INC_ROWCOUNT*UPDATE_PCT/100))"
-  DelRows="$((INC_ROWCOUNT*DELETE_PCT/100))"
+  UpRows=$(bc<<<"${INC_ROWCOUNT}*${UPDATE_PCT}/100")
+  DelRows=$(bc<<<"${INC_ROWCOUNT}*${DELETE_PCT}/100")
   UpDelRows="$((UpRows+DelRows))"
 
   # INSERT incremental 1, UpDelRows
@@ -434,9 +434,9 @@ function start_mon ()
   trap mon_finish SIGINT SIGTERM
 
   while true ; do 
-    srcRowCount="$(get_source_row_count)"
     tgtRowCount="$(get_target_row_count)"
-    echo "$(date +%H:%M:%S) [status] jobs = $(${FLINK_HOME}/bin/flink list -r | grep -c "${JOB_NAME}")" \
+    srcRowCount="$(get_source_row_count)"
+    echo "$(date +%H:%M:%S) [status] jobs = $(${FLINK_HOME}/bin/flink list -r 2>/dev/null | grep -c "${JOB_NAME}")" \
          ", rows: src = ${srcRowCount}, tgt = ${tgtRowCount}, gap = $((srcRowCount-tgtRowCount))"
     sleep 2
   done

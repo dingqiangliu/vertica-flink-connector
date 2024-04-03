@@ -24,8 +24,8 @@ under the License.
 
 	<parent>
 		<groupId>org.apache.flink</groupId>
-		<artifactId>flink-parent</artifactId>
-		<version>1.15.0</version>
+		<artifactId>flink-connector-jdbc-parent</artifactId>
+		<version>3.1.2-1.18</version>
 	</parent>
 
 	<groupId>com.vertica.flink</groupId>
@@ -41,20 +41,21 @@ under the License.
 	<packaging>jar</packaging>
 
 	<properties>
-		<vertica.version>11.1.1-0</vertica.version>
+	    <flink.version>1.18.0</flink.version>
+	    <vertica.version>24.1.0-0</vertica.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-annotations</artifactId>
-			<version>${project.parent.version}</version>
+			<version>${flink.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-table-common</artifactId>
-			<version>${project.parent.version}</version>
+			<version>${flink.version}</version>
 		</dependency>
 
 		<dependency>
